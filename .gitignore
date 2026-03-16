@@ -62,4 +62,5 @@ build-output.txt
 # Ignore Others
 pos-ui/
 pos.Api/
-licensing/
+licensing/*
+licensing/licenses/*.key
