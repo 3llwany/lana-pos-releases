@@ -1,0 +1,15 @@
+{
+  "name": "pos-licensing-tools",
+  "version": "1.0.0",
+  "description": "License generation tools for POS system",
+  "private": true,
+  "scripts": {
+    "generate-keys": "node generate-keys.js",
+    "generate-license": "node generate-license.js"
+  },
+  "dependencies": {
+    "systeminformation": "^5.22.0",
+    "commander": "^12.0.0",
+    "chalk": "^4.1.2"
+  }
+}

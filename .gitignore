@@ -1,0 +1,58 @@
+# OS files
+[Tt]humbs.db
+*.ds_store
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Node / Frontend
+node_modules/
+dist/
+.angular/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# .NET / Backend
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.doccache
+[Dd]ebug/
+[Rr]elease/
+publish/
+appsettings.Local.json
+appsettings.Electron.json
+
+# Electron
+dist-electron/
+*.stackdump
+
+# Environment / Logs
+.env
+.env.local
+*.log
+logs/
+
+# Project Specific
+db_backups/
+licensing/*.key
+.agent/
+.claude/
+.gemini/
+.playwright-mcp/
+build-output.txt
+
+# Root level ignores
+/.agent/
+/.claude/
+/.gemini/
+/.playwright-mcp/
+/build-output.txt
