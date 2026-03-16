@@ -14,6 +14,14 @@ const path = require("path");
 const http = require("http");
 const fs = require("fs");
 
+// Helper: log to both main process and renderer DevTools console
+function log(msg) {
+  console.log(msg);
+  if (mainWindow && mainWindow.webContents) {
+    mainWindow.webContents.executeJavaScript(`console.log('${msg.replace(/'/g, "\\'")}')`).catch(() => {});
+  }
+}
+
 // Configuration
 const API_PORT = 5029;
 const API_URL = `http://localhost:${API_PORT}`;
@@ -201,8 +209,23 @@ app.whenReady().then(async () => {
     await startBackend();
     createWindow();
     
-    // Check for updates
-    autoUpdater.checkForUpdatesAndNotify();
+    // Check for updates (only in packaged app)
+    if (app.isPackaged) {
+      try {
+        log('[AutoUpdater] Starting update check...');
+        log(`[AutoUpdater] Current version: ${app.getVersion()}`);
+        const result = await autoUpdater.checkForUpdatesAndNotify();
+        if (result) {
+          log(`[AutoUpdater] Check result: v${result.updateInfo.version}`);
+        } else {
+          log('[AutoUpdater] Check returned null - no update info');
+        }
+      } catch (updateErr) {
+        log(`[AutoUpdater] ERROR: ${updateErr.message}`);
+      }
+    } else {
+      log('[AutoUpdater] Skipping - app is not packaged (dev mode)');
+    }
   } catch (error) {
     dialog.showErrorBox(
       "خطأ في تشغيل البرنامج",
@@ -235,13 +258,29 @@ if (!gotTheLock) {
 }
 
 // ─────────────────────────────────────────
-// Auto Updater Events
+// Auto Updater Setup & Events
 // ─────────────────────────────────────────
-autoUpdater.on('update-available', () => {
-  console.log('[Electron] Update available.');
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+
+autoUpdater.on('checking-for-update', () => {
+  log('[AutoUpdater] Checking for update...');
+});
+
+autoUpdater.on('update-available', (info) => {
+  log(`[AutoUpdater] Update available: v${info.version}`);
+});
+
+autoUpdater.on('update-not-available', (info) => {
+  log(`[AutoUpdater] No update available. Current version is latest (v${info.version}).`);
+});
+
+autoUpdater.on('download-progress', (progress) => {
+  log(`[AutoUpdater] Download progress: ${Math.round(progress.percent)}%`);
 });
 
 autoUpdater.on('update-downloaded', (info) => {
+  log(`[AutoUpdater] Update downloaded: v${info.version}`);
   dialog.showMessageBox({
     type: 'info',
     title: 'تحديث متاح',
@@ -257,5 +296,5 @@ autoUpdater.on('update-downloaded', (info) => {
 });
 
 autoUpdater.on('error', (err) => {
-  console.error('[Electron] Error in auto-updater: ', err);
+  log(`[AutoUpdater] ERROR: ${err.message}`);
 });
