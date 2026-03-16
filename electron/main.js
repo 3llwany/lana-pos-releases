@@ -8,6 +8,7 @@
  */
 
 const { app, BrowserWindow, dialog } = require("electron");
+const { autoUpdater } = require("electron-updater");
 const { spawn } = require("child_process");
 const path = require("path");
 const http = require("http");
@@ -199,6 +200,9 @@ app.whenReady().then(async () => {
   try {
     await startBackend();
     createWindow();
+    
+    // Check for updates
+    autoUpdater.checkForUpdatesAndNotify();
   } catch (error) {
     dialog.showErrorBox(
       "خطأ في تشغيل البرنامج",
@@ -229,3 +233,29 @@ if (!gotTheLock) {
     }
   });
 }
+
+// ─────────────────────────────────────────
+// Auto Updater Events
+// ─────────────────────────────────────────
+autoUpdater.on('update-available', () => {
+  console.log('[Electron] Update available.');
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  dialog.showMessageBox({
+    type: 'info',
+    title: 'تحديث متاح',
+    message: `تم تحميل إصدار جديد (${info.version}) بنجاح. هل تريد إغلاق البرنامج وتثبيت التحديث الآن؟`,
+    buttons: ['تحديث الآن', 'لاحقاً'],
+    defaultId: 0,
+    cancelId: 1
+  }).then((result) => {
+    if (result.response === 0) {
+      autoUpdater.quitAndInstall();
+    }
+  });
+});
+
+autoUpdater.on('error', (err) => {
+  console.error('[Electron] Error in auto-updater: ', err);
+});

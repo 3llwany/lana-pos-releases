@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "POS Desktop Application",
   "main": "main.js",
-  "author": "POS Team",
+  "author": "LANA SOFT",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
@@ -12,7 +12,8 @@
     "build:dir": "electron-builder --dir"
   },
   "dependencies": {
-    "electron-is-dev": "^2.0.0"
+    "electron-is-dev": "^2.0.0",
+    "electron-updater": "^6.8.3"
   },
   "devDependencies": {
     "electron": "^33.0.0",
@@ -20,7 +21,14 @@
   },
   "build": {
     "appId": "com.pos.desktop",
-    "productName": "POS System",
+    "productName": "LANA POS",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "3llwany",
+        "repo": "lana-pos-releases"
+      }
+    ],
     "copyright": "Copyright © 2026",
     "directories": {
       "output": "../dist-electron"
@@ -60,12 +68,13 @@
       "oneClick": false,
       "perMachine": true,
       "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": true,
       "installerIcon": "icon.ico",
       "uninstallerIcon": "icon.ico",
       "installerHeaderIcon": "icon.ico",
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "POS System"
+      "shortcutName": "LANA POS"
     }
   }
 }
