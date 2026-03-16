@@ -56,3 +56,9 @@ build-output.txt
 /.gemini/
 /.playwright-mcp/
 /build-output.txt
+
+
+
+# Ignore Others
+pos-ui/
+pos.Api/
