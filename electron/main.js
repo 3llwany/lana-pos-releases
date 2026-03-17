@@ -7,7 +7,7 @@
  * 4. Kills the backend when the app closes
  */
 
-const { app, BrowserWindow, dialog } = require("electron");
+const { app, BrowserWindow, dialog, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const { spawn } = require("child_process");
 const path = require("path");
@@ -260,8 +260,21 @@ if (!gotTheLock) {
 // ─────────────────────────────────────────
 // Auto Updater Setup & Events
 // ─────────────────────────────────────────
-autoUpdater.autoDownload = true;
+autoUpdater.autoDownload = false; // Disable auto-download to give user control
 autoUpdater.autoInstallOnAppQuit = true;
+
+// Handle IPC messages from Renderer
+ipcMain.on("check-for-updates", () => {
+  autoUpdater.checkForUpdatesAndNotify();
+});
+
+ipcMain.on("download-update", () => {
+  autoUpdater.downloadUpdate();
+});
+
+ipcMain.on("install-update", () => {
+  autoUpdater.quitAndInstall();
+});
 
 autoUpdater.on('checking-for-update', () => {
   log('[AutoUpdater] Checking for update...');
@@ -269,32 +282,35 @@ autoUpdater.on('checking-for-update', () => {
 
 autoUpdater.on('update-available', (info) => {
   log(`[AutoUpdater] Update available: v${info.version}`);
+  if (mainWindow) {
+    mainWindow.webContents.send("update-available", info);
+  }
 });
 
 autoUpdater.on('update-not-available', (info) => {
   log(`[AutoUpdater] No update available. Current version is latest (v${info.version}).`);
+  if (mainWindow) {
+    mainWindow.webContents.send("update-not-available", info);
+  }
 });
 
 autoUpdater.on('download-progress', (progress) => {
   log(`[AutoUpdater] Download progress: ${Math.round(progress.percent)}%`);
+  if (mainWindow) {
+    mainWindow.webContents.send("download-progress", progress);
+  }
 });
 
 autoUpdater.on('update-downloaded', (info) => {
   log(`[AutoUpdater] Update downloaded: v${info.version}`);
-  dialog.showMessageBox({
-    type: 'info',
-    title: 'تحديث متاح',
-    message: `تم تحميل إصدار جديد (${info.version}) بنجاح. هل تريد إغلاق البرنامج وتثبيت التحديث الآن؟`,
-    buttons: ['تحديث الآن', 'لاحقاً'],
-    defaultId: 0,
-    cancelId: 1
-  }).then((result) => {
-    if (result.response === 0) {
-      autoUpdater.quitAndInstall();
-    }
-  });
+  if (mainWindow) {
+    mainWindow.webContents.send("update-downloaded", info);
+  }
 });
 
 autoUpdater.on('error', (err) => {
   log(`[AutoUpdater] ERROR: ${err.message}`);
+  if (mainWindow) {
+    mainWindow.webContents.send("update-error", err.message);
+  }
 });
