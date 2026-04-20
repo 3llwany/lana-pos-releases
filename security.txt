@@ -1,0 +1,20 @@
+ملخص السكيورتي للعميل
+مشترك بين Web & Electron (10 طبقات):
+JWT Authentication - توكن مشفر بـ HMAC-SHA256 بيتنتهي كل 12 ساعة
+Password Hashing - الباسوردات مش بتتخزن نص عادي (SHA-256 + Salt)
+RBAC - نظام صلاحيات كامل (أدوار + صلاحيات + شاشات)
+6 Route Guards - حماية كل صفحة على حدا
+Backend Permission Checks - [RequirePermission] attribute على كل endpoint
+CORS - السماح لـ origins محددة فقط
+Audit Trail - سجل شامل لكل عملية (مين عملها، من أي فرع، امتى)
+Branch Isolation - كل مستخدم مقيد بالفروع المسموحاله
+Error Handling - حماية من تسريب معلومات داخلية
+UI-Level Permissions - عناصر الواجهة بتختفي حسب الصلاحيات
+خاص بـ Electron (7 طبقات إضافية):
+RSA-Signed License - رخصة موقعة رقمياً
+Machine-Lock - الرخصة مربوطة بجهاز محدد
+Anti-Tamper Storage - بيانات مخزنة في 4 أماكن منفصلة
+Anti-Clock Tamper - كشف التلاعب بالساعة
+File Integrity Check - فحص AES-256 لكل الملفات
+Context Isolation - عزل كامل في Electron
+Auto-Update - تحديثات آمنة تلقائية
